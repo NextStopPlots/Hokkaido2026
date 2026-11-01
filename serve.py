@@ -1,7 +1,7 @@
 from http.server import ThreadingHTTPServer, SimpleHTTPRequestHandler
 
 
-BUILD_VERSION = "254"
+BUILD_VERSION = "255"
 
 
 class NoCacheHandler(SimpleHTTPRequestHandler):

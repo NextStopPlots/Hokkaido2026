@@ -791,7 +791,7 @@ function renderTimeline() {
   const itineraryPhoto = document.querySelector("#itinerary-day-photo-placeholder");
   const itineraryPhotoName = itineraryPhotoNames[state.selectedItineraryDay];
   if (itineraryPhoto && itineraryPhotoName) {
-    itineraryPhoto.style.backgroundImage = `url("assets/itinerary/${itineraryPhotoName}?v=254")`;
+    itineraryPhoto.style.backgroundImage = `url("assets/itinerary/${itineraryPhotoName}?v=255")`;
     itineraryPhoto.setAttribute("aria-label", `DAY ${state.selectedItineraryDay} 行程照片`);
   }
   renderItineraryDateStrip();
@@ -1544,7 +1544,7 @@ function preloadDefaultRouteMap() {
 
 async function init() {
   try {
-    const response = await fetch("trip-data.json?v=254", { cache: "no-store" });
+    const response = await fetch("trip-data.json?v=255", { cache: "no-store" });
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
     state.data = await response.json();
     state.config = normalizeTripConfig(state.data.config);
