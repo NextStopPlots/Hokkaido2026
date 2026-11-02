@@ -1002,16 +1002,26 @@ function renderTodoList() {
     const todoId = row.dataset.todoId;
     let pressState = null;
     let suppressClick = false;
+    const clearNativeSelection = () => {
+      const selection = window.getSelection?.();
+      if (selection?.rangeCount) selection.removeAllRanges();
+    };
+    const blockNativeSelection = () => clearNativeSelection();
     const clearPress = () => {
       if (pressState?.timer) window.clearTimeout(pressState.timer);
       pressState = null;
+      document.removeEventListener("selectionchange", blockNativeSelection);
     };
     row.addEventListener("pointerdown", (event) => {
       if (event.button != null && event.button !== 0) return;
       clearPress();
+      clearNativeSelection();
+      document.addEventListener("selectionchange", blockNativeSelection);
       pressState = { pointerId: event.pointerId, x: event.clientX, y: event.clientY,
         timer: window.setTimeout(() => {
           suppressClick = true;
+          // Clear native iOS selection before and after the delete sheet opens.
+          clearNativeSelection();
           try { navigator.vibrate?.(18); } catch (_) {}
           clearPress();
           const todo = state.todos.find((entry) => entry.id === todoId);
@@ -1024,6 +1034,7 @@ function renderTodoList() {
               renderTodoList();
             }
           });
+          requestAnimationFrame(clearNativeSelection);
         }, WISHLIST_LONG_PRESS_MS)
       };
     });
@@ -1038,6 +1049,9 @@ function renderTodoList() {
       if (suppressClick) { event.preventDefault(); event.stopPropagation(); suppressClick = false; }
     }, true);
     row.addEventListener("contextmenu", (event) => event.preventDefault());
+    // v261: prevent iOS Safari from starting native text selection during
+    // the memo-row long-press gesture. Do not affect the add/edit inputs.
+    row.addEventListener("selectstart", (event) => event.preventDefault());
   });
 }
 

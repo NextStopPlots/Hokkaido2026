@@ -1,0 +1,1 @@
+v260: 修正備忘錄清單長按刪除時 iOS 文字選取藍色反白與選取游標。僅修改 app.js、styles.css 及對應快取版本；其他 v259 已驗收內容保持不變。請於 iPhone Safari 與 Android 驗收。

@@ -1404,6 +1404,57 @@
     input.setAttribute("size", String(length));
   }
 
+  // iOS WebKit: the software keyboard changes visualViewport without reliably
+  // resizing a fixed bottom sheet. Keep the sheet inside the visible viewport.
+  const isIOSWebKit = /iP(ad|hone|od)/.test(navigator.userAgent) ||
+    (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+  let entrySheetFocusFrame = 0;
+
+  function syncEntrySheetKeyboardViewport() {
+    if (!isIOSWebKit || !entrySheetOpen) return;
+    const layer = ledgerRoot?.querySelector("[data-ledger-entry-sheet]");
+    const viewport = window.visualViewport;
+    if (!layer || !viewport) return;
+    // Fixed-position coordinates are relative to the layout viewport.
+    const top = Math.max(0, viewport.offsetTop);
+    layer.style.top = `${top}px`;
+    layer.style.bottom = "auto";
+    layer.style.height = `${viewport.height}px`;
+    const active = document.activeElement;
+    if (!active || !layer.contains(active) || !active.matches("input:not([type=hidden]), textarea")) return;
+    cancelAnimationFrame(entrySheetFocusFrame);
+    entrySheetFocusFrame = requestAnimationFrame(() => {
+      const scroll = layer.querySelector(".ledger-entry-sheet-scroll");
+      if (!scroll || !scroll.contains(active)) return;
+      const field = active.getBoundingClientRect();
+      const visible = scroll.getBoundingClientRect();
+      const padding = 16;
+      if (field.bottom > visible.bottom - padding) {
+        scroll.scrollTop += field.bottom - (visible.bottom - padding);
+      } else if (field.top < visible.top + padding) {
+        scroll.scrollTop -= visible.top + padding - field.top;
+      }
+    });
+  }
+
+  function resetEntrySheetKeyboardViewport() {
+    cancelAnimationFrame(entrySheetFocusFrame);
+    const layer = ledgerRoot?.querySelector("[data-ledger-entry-sheet]");
+    if (!layer) return;
+    layer.style.top = "";
+    layer.style.bottom = "";
+    layer.style.height = "";
+  }
+
+  if (isIOSWebKit) {
+    window.visualViewport?.addEventListener("resize", syncEntrySheetKeyboardViewport);
+    window.visualViewport?.addEventListener("scroll", syncEntrySheetKeyboardViewport);
+    document.addEventListener("focusin", (event) => {
+      if (!entrySheetOpen || !event.target.closest?.("[data-ledger-entry-sheet]")) return;
+      requestAnimationFrame(syncEntrySheetKeyboardViewport);
+    });
+  }
+
   function lockEntrySheetBackground() {
     if (document.body.classList.contains("ledger-entry-sheet-open")) return;
     entrySheetScrollY = window.scrollY || window.pageYOffset || 0;
@@ -1443,6 +1494,7 @@
     lockEntrySheetBackground();
     syncEntrySheetAmountSizing(layer.querySelector(".ledger-sheet-amount-input"));
     requestAnimationFrame(() => layer.classList.add("is-open"));
+    syncEntrySheetKeyboardViewport();
   }
 
   function closeEntrySheet({ animate = true } = {}) {
@@ -1453,6 +1505,7 @@
       entrySheetOpen = false;
       editingBillId = null;
       billDraft = null;
+      resetEntrySheetKeyboardViewport();
       unlockEntrySheetBackground();
       renderApp();
     };
@@ -2087,6 +2140,8 @@
     if (event.target.closest("button, a, input, select, textarea, label")) return;
     const row = event.target.closest(".ledger-bill-row");
     if (!row || !ledgerRoot.contains(row)) return;
+    // v259: clear any residual browser text selection before the hold timer.
+    if (window.getSelection?.()?.rangeCount) window.getSelection().removeAllRanges();
     if (activeBillActionRow && activeBillActionRow !== row) closeBillActionMenu(activeBillActionRow);
     clearBillLongPress();
     const state = {
@@ -2269,6 +2324,11 @@
     ledgerData = normalizeData(stored);
     activeTab = location.hash === "#ledger-stats" ? "stats" : "entry";
     ledgerRoot.addEventListener("click", handleRootClick);
+    ledgerRoot.addEventListener("contextmenu", (event) => {
+      if (event.target.closest?.(".ledger-bill-row") && !event.target.closest?.("input, textarea, select, a, button")) {
+        event.preventDefault();
+      }
+    });
     ledgerRoot.addEventListener("pointerdown", handleBillPointerDown);
     ledgerRoot.addEventListener("pointermove", handleBillPointerMove);
     ledgerRoot.addEventListener("pointerup", handleBillPointerEnd);

@@ -3939,3 +3939,70 @@ body[data-active-view="travel"] main[data-site-view="travel"] { overflow: visibl
   text-align: left;
   cursor: pointer;
 }
+
+/* v257: iOS Safari form focus and native button normalization.
+   Scoped to WebKit touch browsers; do not change Android layouts. */
+@supports (-webkit-touch-callout: none) {
+  #wishlist-dialog .wishlist-field input,
+  #wishlist-dialog .wishlist-field textarea,
+  .v170-todo-dialog .todo-form input,
+  .v170-todo-dialog .todo-form textarea,
+  .todo-form input { font-size: 16px !important; }
+  .v170-todo-dialog .v170-close {
+    -webkit-appearance: none; appearance: none;
+    border: 0 !important; outline: 0; box-shadow: none !important;
+    background: transparent !important; border-radius: 0;
+    display: inline-flex; align-items: center; justify-content: center;
+    padding: 0;
+  }
+  .v170-todo-dialog .v170-close:focus-visible {
+    outline: 2px solid #66757a; outline-offset: 2px;
+  }
+  #wishlist-dialog[open] { max-height: min(90dvh, 760px) !important; }
+}
+
+/* v258: memo close button — remove visible square in all pointer/focus states. */
+.v170-todo-dialog .v170-close,
+.v170-todo-dialog .v170-close:hover,
+.v170-todo-dialog .v170-close:active,
+.v170-todo-dialog .v170-close:focus,
+.v170-todo-dialog .v170-close:focus-visible {
+  -webkit-appearance: none !important; appearance: none !important;
+  border: 0 !important; outline: 0 !important; box-shadow: none !important;
+  background: transparent !important; border-radius: 0 !important;
+}
+/* Preserve accessible focus indication for keyboard-only navigation. */
+/* v259: keep the close glyph free of underlines in touch/focus states. */
+.v170-todo-dialog .v170-close,
+.v170-todo-dialog .v170-close:focus,
+.v170-todo-dialog .v170-close:focus-visible {
+  text-decoration: none !important;
+  -webkit-text-decoration: none !important;
+}
+
+/* v259: vertically center the rental note bullet on the first 14px/1.55 line.
+   Existing 8px top padding and 4px marker size are retained. */
+.accommodation-view #rental-panel .drive-note-panel ul li::before {
+  top: calc(8px + (14px * 1.55 - 4px) / 2);
+}
+
+/* v260: memo checklist long-press must not trigger iOS text selection or callout.
+   Scoped to displayed checklist rows; editing fields remain selectable. */
+.prep-view #prep-panel-memo .todo-item,
+.prep-view #prep-panel-memo .todo-item label,
+.prep-view #prep-panel-memo .todo-item .todo-text {
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* v261: block native text selection on every child of memo checklist rows.
+   This deliberately excludes the new/edit memo dialog inputs. */
+.prep-view #prep-panel-memo .todo-item,
+.prep-view #prep-panel-memo .todo-item * {
+  -webkit-user-select: none !important;
+  user-select: none !important;
+  -webkit-touch-callout: none !important;
+  -webkit-tap-highlight-color: transparent;
+}

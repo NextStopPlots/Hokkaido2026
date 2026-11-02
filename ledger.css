@@ -3450,3 +3450,55 @@ body.ledger-entry-sheet-open {
 }
 
 
+
+/* v257: prevent iOS focus zoom; center native date text without resizing fields. */
+@supports (-webkit-touch-callout: none) {
+  .ledger-entry-sheet input:not([type="hidden"]),
+  .ledger-entry-sheet textarea,
+  .ledger-bill-form .ledger-note-field .ledger-input,
+  .ledger-bill-form .ledger-date-field .ledger-date-native {
+    font-size: 16px !important;
+  }
+  .ledger-bill-form .ledger-date-field .ledger-date-native {
+    line-height: normal !important;
+    padding-top: 0 !important; padding-bottom: 0 !important;
+  }
+  .ledger-bill-form .ledger-date-field .ledger-date-native::-webkit-date-and-time-value {
+    min-height: 100%; text-align: left;
+  }
+  .ledger-bill-form .ledger-date-field .ledger-date-native::-webkit-datetime-edit {
+    display: inline-flex; align-items: center; min-height: 100%;
+  }
+}
+
+/* v258: iOS native date control: center its internal WebKit value box.
+   Do not change the 40px control dimensions or Android styling. */
+@supports (-webkit-touch-callout: none) {
+  .ledger-bill-form .ledger-date-field .ledger-date-native {
+    height: 40px !important; min-height: 40px !important;
+    line-height: 40px !important;
+    padding-block: 0 !important;
+  }
+  .ledger-bill-form .ledger-date-field .ledger-date-native::-webkit-date-and-time-value {
+    display: flex !important; align-items: center !important;
+    height: 40px !important; min-height: 40px !important;
+    line-height: normal !important;
+    margin: 0 !important; padding: 0 !important;
+  }
+  .ledger-bill-form .ledger-date-field .ledger-date-native::-webkit-datetime-edit {
+    display: inline-flex !important; align-items: center !important;
+    height: 40px !important; min-height: 40px !important;
+    line-height: normal !important;
+    padding: 0 !important;
+  }
+}
+
+/* v259: suppress native long-press selection only on expense rows.
+   Other site text remains selectable. */
+.ledger-bill-row, .ledger-bill-row .ledger-bill-content,
+.ledger-bill-row .ledger-bill-content * {
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
+}

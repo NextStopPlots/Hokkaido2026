@@ -1,0 +1,5 @@
+v262 navigation history test
+- Change site-navigation.js navigate() and travel-ledger:navigate to history.replaceState.
+- Update index.html navigation script cache query to v262.
+- Browser-native back/forward edge gestures cannot be universally disabled.
+- Verify navigation and back/forward behavior on iOS and Android before publishing.

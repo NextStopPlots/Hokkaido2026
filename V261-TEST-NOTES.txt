@@ -1,0 +1,6 @@
+v261 changes (relative to v260):
+- Scoped selectstart preventDefault to memo checklist rows.
+- Clear native selection during long-press, and after opening delete confirmation.
+- Extend iOS user-select/touch-callout prevention to all descendants of memo rows.
+- Memo add/edit inputs, other screens and layouts are unchanged.
+- Requires real iPhone Safari and Android verification.

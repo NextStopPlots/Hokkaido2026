@@ -1,0 +1,5 @@
+v259 iOS/Android targeted fixes (based on v258):
+1. Disable native selection/callout only on long-press ledger bill rows.
+2. Remove memo close X underline while preserving icon and hit area.
+3. Align rental note bullet with first text line center.
+Date input and iOS keyboard fixes preserved. Test on real devices before publishing.

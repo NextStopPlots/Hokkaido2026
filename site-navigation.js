@@ -97,7 +97,7 @@
       setVisibleView(nextView, { targetId: nextView === "travel" ? hash.slice(1) : "" });
       return;
     }
-    history.pushState({ view: nextView }, "", hash);
+    history.replaceState({ view: nextView }, "", hash);
     setVisibleView(nextView, { targetId: nextView === "travel" ? hash.slice(1) : "" });
   }
 
@@ -196,7 +196,7 @@
     });
     window.addEventListener("travel-ledger:navigate", (event) => {
       const hash = event.detail?.tab === "stats" ? "#ledger-stats" : "#ledger";
-      if (location.hash !== hash) history.pushState({ view: "ledger" }, "", hash);
+      if (location.hash !== hash) history.replaceState({ view: "ledger" }, "", hash);
     });
   }
 
